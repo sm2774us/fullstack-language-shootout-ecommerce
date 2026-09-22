@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-csharp
+  namespace: ecommerce-shootout
+  labels: { app: backend-csharp }
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: backend-csharp }
+  template:
+    metadata:
+      labels: { app: backend-csharp }
+    spec:
+      containers:
+        - name: backend-csharp
+          image: backend-csharp:latest
+          ports: [{ containerPort: 8080 }]
+          readinessProbe:
+            httpGet: { path: /healthz, port: 8080 }
+            initialDelaySeconds: 5
+          resources:
+            requests: { cpu: "100m", memory: "128Mi" }
+            limits: { cpu: "500m", memory: "512Mi" }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-csharp
+  namespace: ecommerce-shootout
+spec:
+  selector: { app: backend-csharp }
+  ports: [{ port: 8080, targetPort: 8080 }]

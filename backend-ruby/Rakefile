@@ -1,0 +1,20 @@
+# Zero-config-ish Nx entry point: `rake build` / `rake serve`.
+task :build do
+  sh "bundle install"
+end
+
+task :serve do
+  sh "bundle exec puma -b tcp://0.0.0.0:8080 apps/web-api/config.ru"
+end
+
+
+desc "Generate Ruby gRPC stubs from ../proto/ecommerce.proto"
+task :codegen do
+  sh "bundle exec grpc_tools_ruby_protoc " \
+     "-I ../proto " \
+     "--ruby_out=modules/generated " \
+     "--grpc_out=modules/generated " \
+     "../proto/ecommerce.proto"
+end
+
+task default: :serve

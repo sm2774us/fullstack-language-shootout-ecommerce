@@ -1,0 +1,42 @@
+{
+  "name": "backend-rust",
+  "private": true,
+  "nx": {
+    "targets": {
+      "build": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "cargo build --release",
+          "cwd": "backend-rust"
+        }
+      },
+      "serve": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "cargo run",
+          "cwd": "backend-rust"
+        }
+      },
+      "container-build": {
+        "executor": "nx:run-commands",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "command": "docker build -t backend-rust:latest -f ./backend-rust/Dockerfile ./backend-rust"
+        }
+      },
+      "generate": {
+        "executor": "nx:run-commands",
+        "cache": true,
+        "inputs": [
+          "{workspaceRoot}/proto/ecommerce.proto"
+        ],
+        "options": {
+          "command": "cargo build --release --bin codegen-check",
+          "cwd": "backend-rust"
+        }
+      }
+    }
+  }
+}

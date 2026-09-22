@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-web
+  namespace: ecommerce-shootout
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: frontend-web }
+  template:
+    metadata:
+      labels: { app: frontend-web }
+    spec:
+      containers:
+        - name: frontend-web
+          image: frontend-web:latest
+          ports: [{ containerPort: 3000 }]
+          env:
+            - name: BACKEND_TARGET_URL
+              value: "http://backend-python:8080"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-web
+  namespace: ecommerce-shootout
+spec:
+  type: LoadBalancer
+  selector: { app: frontend-web }
+  ports: [{ port: 80, targetPort: 3000 }]

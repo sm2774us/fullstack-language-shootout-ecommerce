@@ -1,0 +1,165 @@
+syntax = "proto3";
+
+package ecommerce.v1;
+
+// ---------------------------------------------------------------------------
+// Shared perf/health contract implemented by every backend (used by k6 shootout)
+// ---------------------------------------------------------------------------
+service PerfService {
+  rpc Perf (PerfRequest) returns (PerfResponse);
+}
+
+message PerfRequest {}
+
+message PerfResponse {
+  string backend = 1;
+  string language = 2;
+  int64  server_time_unix_ms = 3;
+  string status = 4;
+}
+
+// ---------------------------------------------------------------------------
+// Catalog module — public-api surface. Backs product listing/search on the
+// storefront home route and the order line-item validation in Orders.
+// ---------------------------------------------------------------------------
+service CatalogService {
+  rpc ListProducts (ListProductsRequest) returns (ListProductsResponse);
+  rpc GetProduct (GetProductRequest) returns (Product);
+  rpc SearchProducts (SearchProductsRequest) returns (ListProductsResponse);
+}
+
+message Product {
+  string sku = 1;
+  string name = 2;
+  string description = 3;
+  int64 price_cents = 4;
+  string category = 5;
+  int32 stock_quantity = 6;
+  repeated string image_urls = 7;
+}
+
+message ListProductsRequest {
+  string category = 1;   // optional filter, empty = all
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListProductsResponse {
+  repeated Product products = 1;
+  string next_page_token = 2;
+}
+
+message GetProductRequest {
+  string sku = 1;
+}
+
+message SearchProductsRequest {
+  string query = 1;
+  int32 page_size = 2;
+}
+
+// ---------------------------------------------------------------------------
+// Orders module — public-api surface. Only this surface may be called
+// cross-module; internal/ and infrastructure/ packages are never imported
+// outside modules/orders/**.
+// ---------------------------------------------------------------------------
+service OrdersService {
+  rpc CreateOrder (CreateOrderRequest) returns (Order);
+  rpc GetOrder (GetOrderRequest) returns (Order);
+  rpc ListOrders (ListOrdersRequest) returns (ListOrdersResponse);
+}
+
+message OrderLineItem {
+  string sku = 1;
+  int32 quantity = 2;
+  int64 unit_price_cents = 3;
+}
+
+message Order {
+  string order_id = 1;
+  string customer_id = 2;
+  repeated OrderLineItem items = 3;
+  int64 total_cents = 4;
+  string status = 5; // PENDING | PAID | FULFILLED | CANCELLED
+  int64 created_at_unix_ms = 6;
+}
+
+message CreateOrderRequest {
+  string customer_id = 1;
+  repeated OrderLineItem items = 2;
+}
+
+message GetOrderRequest {
+  string order_id = 1;
+}
+
+message ListOrdersRequest {
+  string customer_id = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListOrdersResponse {
+  repeated Order orders = 1;
+  string next_page_token = 2;
+}
+
+// ---------------------------------------------------------------------------
+// Payments module — public-api surface.
+// ---------------------------------------------------------------------------
+service PaymentsService {
+  rpc AuthorizePayment (AuthorizePaymentRequest) returns (PaymentResult);
+  rpc CapturePayment (CapturePaymentRequest) returns (PaymentResult);
+  rpc RefundPayment (RefundPaymentRequest) returns (PaymentResult);
+}
+
+message AuthorizePaymentRequest {
+  string order_id = 1;
+  int64 amount_cents = 2;
+  string payment_method_token = 3; // Stripe PaymentMethod id from frontend
+}
+
+message CapturePaymentRequest {
+  string payment_id = 1;
+}
+
+message RefundPaymentRequest {
+  string payment_id = 1;
+  int64 amount_cents = 2;
+}
+
+message PaymentResult {
+  string payment_id = 1;
+  string order_id = 2;
+  string status = 3; // AUTHORIZED | CAPTURED | REFUNDED | FAILED
+  int64 amount_cents = 4;
+}
+
+// Internal representation of a verified Stripe webhook event, used by the
+// payments/internal webhook handler in each backend after signature
+// verification (see docs/stripe-webhooks.md for the shared pattern).
+message StripeWebhookEvent {
+  string event_id = 1;
+  string type = 2;          // e.g. "payment_intent.succeeded"
+  string payment_intent_id = 3;
+  int64 amount_cents = 4;
+  string raw_payload_json = 5;
+}
+
+// ---------------------------------------------------------------------------
+// Notifications module — public-api surface.
+// ---------------------------------------------------------------------------
+service NotificationsService {
+  rpc SendOrderConfirmation (SendOrderConfirmationRequest) returns (NotificationResult);
+}
+
+message SendOrderConfirmationRequest {
+  string order_id = 1;
+  string customer_id = 2;
+  string channel = 3; // EMAIL | SMS | PUSH
+}
+
+message NotificationResult {
+  string notification_id = 1;
+  string status = 2; // QUEUED | SENT | FAILED
+}

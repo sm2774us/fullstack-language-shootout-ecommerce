@@ -1,0 +1,22 @@
+{
+  "name": "shared-benchmarks",
+  "private": true,
+  "scripts": {
+    "k6-test": "k6 run load-test.js",
+    "analyze": "node parse-results.js"
+  },
+  "nx": {
+    "targets": {
+      "k6-test": {
+        "executor": "nx:run-commands",
+        "cache": false,
+        "options": { "command": "k6 run shared-benchmarks/load-test.js" }
+      },
+      "analyze": {
+        "executor": "nx:run-commands",
+        "cache": false,
+        "options": { "command": "node shared-benchmarks/parse-results.js" }
+      }
+    }
+  }
+}

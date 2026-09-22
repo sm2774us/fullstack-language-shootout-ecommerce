@@ -1,0 +1,4 @@
+(library
+ (name catalog_public_api)
+ (libraries catalog_internal yojson)
+ (modules catalog_public_api))

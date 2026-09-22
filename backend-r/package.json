@@ -1,0 +1,42 @@
+{
+  "name": "backend-r",
+  "private": true,
+  "nx": {
+    "targets": {
+      "build": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "R -e \"devtools::document()\"",
+          "cwd": "backend-r"
+        }
+      },
+      "serve": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "Rscript apps/web-api/run.R",
+          "cwd": "backend-r"
+        }
+      },
+      "container-build": {
+        "executor": "nx:run-commands",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "command": "docker build -t backend-r:latest -f ./backend-r/Dockerfile ./backend-r"
+        }
+      },
+      "generate": {
+        "executor": "nx:run-commands",
+        "cache": true,
+        "inputs": [
+          "{workspaceRoot}/proto/ecommerce.proto"
+        ],
+        "options": {
+          "command": "Rscript -e \"source('R/generated.R'); generate_stubs()\"",
+          "cwd": "backend-r"
+        }
+      }
+    }
+  }
+}

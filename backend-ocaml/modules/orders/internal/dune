@@ -1,0 +1,3 @@
+(library
+ (name orders_internal)
+ (modules order_service))

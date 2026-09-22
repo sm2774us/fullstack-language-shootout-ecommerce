@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ecommerce-shootout
+  labels:
+    # Enables Istio sidecar injection cluster-wide for this namespace; see
+    # service-mesh.yaml for the accompanying mTLS PeerAuthentication policy.
+    # Swap for `linkerd.io/inject: enabled` if using Linkerd instead.
+    istio-injection: enabled

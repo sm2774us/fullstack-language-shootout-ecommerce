@@ -1,0 +1,3 @@
+(executable
+ (name main)
+ (libraries dream yojson unix orders_public_api catalog_public_api payments_internal payments_public_api))

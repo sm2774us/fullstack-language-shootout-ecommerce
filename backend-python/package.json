@@ -1,0 +1,42 @@
+{
+  "name": "backend-python",
+  "private": true,
+  "nx": {
+    "targets": {
+      "build": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "uv pip install --system -e .",
+          "cwd": "backend-python"
+        }
+      },
+      "serve": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "python apps/web-api/main.py",
+          "cwd": "backend-python"
+        }
+      },
+      "container-build": {
+        "executor": "nx:run-commands",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "command": "docker build -t backend-python:latest -f ./backend-python/Dockerfile ./backend-python"
+        }
+      },
+      "generate": {
+        "executor": "nx:run-commands",
+        "dependsOn": [
+          "proto:generate"
+        ],
+        "cache": true,
+        "options": {
+          "command": "echo 'stubs provided by proto:generate (buf)'",
+          "cwd": "backend-python"
+        }
+      }
+    }
+  }
+}

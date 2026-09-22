@@ -1,0 +1,21 @@
+{
+  "name": "proto",
+  "root": "proto",
+  "targets": {
+    "generate": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["{workspaceRoot}/proto/ecommerce.proto", "{workspaceRoot}/buf.gen.yaml"],
+      "outputs": [
+        "{workspaceRoot}/backend-python/modules/generated",
+        "{workspaceRoot}/backend-golang/modules/generated",
+        "{workspaceRoot}/backend-java/src/main/java",
+        "{workspaceRoot}/backend-kotlin/src/main/kotlin",
+        "{workspaceRoot}/backend-csharp/modules/generated",
+        "{workspaceRoot}/backend-cpp/modules/generated",
+        "{workspaceRoot}/frontend-web/src/lib/generated"
+      ],
+      "options": { "command": "buf generate", "cwd": "." }
+    }
+  }
+}

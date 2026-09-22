@@ -1,0 +1,136 @@
+name: CI Polyglot Benchmarking Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  orchestrate-benchmarks:
+    name: Core Engine Run on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Initialize Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Setup system compilers & toolchains (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake openjdk-21-jdk maven \
+            ruby-full ocaml opam r-base
+
+      - name: Setup native compilers & toolchains (Windows)
+        if: matrix.os == 'windows-latest'
+        run: choco install cmake openjdk21 maven ruby r -y
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup Go toolchain
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+
+      - name: Setup sbt (Scala) and Gradle (Kotlin)
+        uses: sbt/setup-sbt@v1
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Install k6 (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg \
+            --keyserver hkp://keyserver.ubuntu.com:80 \
+            --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" \
+            | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install -y k6
+
+      - name: Install k6 (Windows)
+        if: matrix.os == 'windows-latest'
+        run: choco install k6 -y
+
+      - name: Install monorepo root dependencies
+        run: npm ci
+
+      - name: Calculate affected projects via Nx
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Build affected native targets (Nx cache protected)
+        run: npx nx affected -t build --parallel=3
+
+      - name: Build affected container images
+        if: matrix.os == 'ubuntu-latest'
+        run: npx nx affected -t container-build --parallel=1
+
+      - name: Run sequential benchmarking matrix (Ubuntu only)
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          mkdir -p benchmarking-results
+          declare -a backends=(
+            "backend-python:8080:python"
+            "backend-rust:8081:rust"
+            "backend-golang:8082:golang"
+            "backend-cpp:8083:cpp"
+            "backend-java:8084:java"
+            "backend-csharp:8085:csharp"
+            "backend-kotlin:8086:kotlin"
+            "backend-scala:8087:scala"
+            "backend-r:8088:r"
+            "backend-ruby:8089:ruby"
+            "backend-ocaml:8090:ocaml"
+          )
+
+          for item in "${backends[@]}"; do
+            IFS=':' read -r service port label <<< "$item"
+            echo "Booting and benchmarking: $service on host port $port"
+
+            docker compose up -d prometheus grafana "$service"
+            sleep 5
+
+            TARGET_URL="http://localhost:${port}" BACKEND_NAME="$label" \
+              npx nx run shared-benchmarks:k6-test
+
+            docker compose down
+          done
+
+      - name: Aggregate final statistics report
+        if: matrix.os == 'ubuntu-latest'
+        run: npx nx run shared-benchmarks:analyze
+
+      - name: Export summary table to GitHub Actions UI
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: cat benchmarking-results/summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Archive performance evaluation artifacts
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmarking-metrics-${{ matrix.os }}
+          path: benchmarking-results/

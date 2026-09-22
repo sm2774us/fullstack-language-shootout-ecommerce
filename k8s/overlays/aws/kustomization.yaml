@@ -1,0 +1,42 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources: [../../base]
+# EKS: point every image at <account>.dkr.ecr.<region>.amazonaws.com/<name>:latest — swap the
+# placeholder segments (account/region/project) for your own.
+images:
+  - name: backend-python
+    newName: <account>.dkr.ecr.<region>.amazonaws.com/backend-python
+    newTag: latest
+  - name: backend-rust
+    newName: <account>.dkr.ecr.<region>.amazonaws.com/backend-rust
+    newTag: latest
+  - name: backend-golang
+    newName: <account>.dkr.ecr.<region>.amazonaws.com/backend-golang
+    newTag: latest
+  - name: backend-cpp
+    newName: <account>.dkr.ecr.<region>.amazonaws.com/backend-cpp
+    newTag: latest
+  - name: backend-java
+    newName: <account>.dkr.ecr.<region>.amazonaws.com/backend-java
+    newTag: latest
+  - name: backend-csharp
+    newName: <account>.dkr.ecr.<region>.amazonaws.com/backend-csharp
+    newTag: latest
+  - name: backend-kotlin
+    newName: <account>.dkr.ecr.<region>.amazonaws.com/backend-kotlin
+    newTag: latest
+  - name: backend-scala
+    newName: <account>.dkr.ecr.<region>.amazonaws.com/backend-scala
+    newTag: latest
+  - name: backend-r
+    newName: <account>.dkr.ecr.<region>.amazonaws.com/backend-r
+    newTag: latest
+  - name: backend-ruby
+    newName: <account>.dkr.ecr.<region>.amazonaws.com/backend-ruby
+    newTag: latest
+  - name: backend-ocaml
+    newName: <account>.dkr.ecr.<region>.amazonaws.com/backend-ocaml
+    newTag: latest
+  - name: frontend-web
+    newName: <account>.dkr.ecr.<region>.amazonaws.com/frontend-web
+    newTag: latest

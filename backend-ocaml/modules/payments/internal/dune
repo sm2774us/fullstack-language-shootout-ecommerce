@@ -1,0 +1,4 @@
+(library
+ (name payments_internal)
+ (libraries digestif digestif.ocaml unix)
+ (modules stripe_webhook_verifier payment_service))

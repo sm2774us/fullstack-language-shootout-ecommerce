@@ -1,0 +1,4 @@
+(library
+ (name notifications_public_api)
+ (libraries notifications_internal)
+ (modules notifications_public_api))

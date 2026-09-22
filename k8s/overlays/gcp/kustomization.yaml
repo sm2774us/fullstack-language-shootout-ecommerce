@@ -1,0 +1,42 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources: [../../base]
+# GKE: point every image at <region>-docker.pkg.dev/<project>/shootout/<name>:latest — swap the
+# placeholder segments (account/region/project) for your own.
+images:
+  - name: backend-python
+    newName: <region>-docker.pkg.dev/<project>/shootout/backend-python
+    newTag: latest
+  - name: backend-rust
+    newName: <region>-docker.pkg.dev/<project>/shootout/backend-rust
+    newTag: latest
+  - name: backend-golang
+    newName: <region>-docker.pkg.dev/<project>/shootout/backend-golang
+    newTag: latest
+  - name: backend-cpp
+    newName: <region>-docker.pkg.dev/<project>/shootout/backend-cpp
+    newTag: latest
+  - name: backend-java
+    newName: <region>-docker.pkg.dev/<project>/shootout/backend-java
+    newTag: latest
+  - name: backend-csharp
+    newName: <region>-docker.pkg.dev/<project>/shootout/backend-csharp
+    newTag: latest
+  - name: backend-kotlin
+    newName: <region>-docker.pkg.dev/<project>/shootout/backend-kotlin
+    newTag: latest
+  - name: backend-scala
+    newName: <region>-docker.pkg.dev/<project>/shootout/backend-scala
+    newTag: latest
+  - name: backend-r
+    newName: <region>-docker.pkg.dev/<project>/shootout/backend-r
+    newTag: latest
+  - name: backend-ruby
+    newName: <region>-docker.pkg.dev/<project>/shootout/backend-ruby
+    newTag: latest
+  - name: backend-ocaml
+    newName: <region>-docker.pkg.dev/<project>/shootout/backend-ocaml
+    newTag: latest
+  - name: frontend-web
+    newName: <region>-docker.pkg.dev/<project>/shootout/frontend-web
+    newTag: latest

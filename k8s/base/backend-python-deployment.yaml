@@ -1,0 +1,38 @@
+# Deployment/Service for backend-python. The other ten backends have
+# identical Deployment/Service/HPA manifests (backend-<lang>-deployment.yaml,
+# backend-<lang>-hpa.yaml) generated from this exact shape — only
+# name/image/labels differ, so autoscaling behavior isn't itself a
+# confounding variable in the language comparison.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-python
+  namespace: ecommerce-shootout
+  labels: { app: backend-python }
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: backend-python }
+  template:
+    metadata:
+      labels: { app: backend-python }
+    spec:
+      containers:
+        - name: backend-python
+          image: backend-python:latest
+          ports: [{ containerPort: 8080 }]
+          readinessProbe:
+            httpGet: { path: /healthz, port: 8080 }
+            initialDelaySeconds: 5
+          resources:
+            requests: { cpu: "100m", memory: "128Mi" }
+            limits: { cpu: "500m", memory: "512Mi" }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-python
+  namespace: ecommerce-shootout
+spec:
+  selector: { app: backend-python }
+  ports: [{ port: 8080, targetPort: 8080 }]

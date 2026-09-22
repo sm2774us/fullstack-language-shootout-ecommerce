@@ -1,0 +1,15 @@
+; Generates OCaml protobuf message + gRPC service stubs from
+; ../../proto/ecommerce.proto via ocaml-protoc-plugin at build time.
+(rule
+ (targets ecommerce.ml ecommerce.mli)
+ (deps ../../proto/ecommerce.proto)
+ (action
+  (run ocaml-protoc-plugin
+       -I ../../proto
+       --ml-out .
+       ../../proto/ecommerce.proto)))
+
+(library
+ (name ecommerce_generated)
+ (modules ecommerce)
+ (libraries ocaml-protoc-plugin))

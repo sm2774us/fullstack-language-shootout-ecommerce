@@ -1,0 +1,42 @@
+{
+  "name": "backend-scala",
+  "private": true,
+  "nx": {
+    "targets": {
+      "build": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "sbt compile",
+          "cwd": "backend-scala"
+        }
+      },
+      "serve": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "sbt run",
+          "cwd": "backend-scala"
+        }
+      },
+      "container-build": {
+        "executor": "nx:run-commands",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "command": "docker build -t backend-scala:latest -f ./backend-scala/Dockerfile ./backend-scala"
+        }
+      },
+      "generate": {
+        "executor": "nx:run-commands",
+        "cache": true,
+        "inputs": [
+          "{workspaceRoot}/proto/ecommerce.proto"
+        ],
+        "options": {
+          "command": "sbt Compile/PB.generate",
+          "cwd": "backend-scala"
+        }
+      }
+    }
+  }
+}

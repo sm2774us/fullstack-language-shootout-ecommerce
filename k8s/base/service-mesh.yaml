@@ -1,0 +1,15 @@
+# Istio mTLS policy for the namespace. Sidecar injection itself is enabled
+# via the istio-injection label on the Namespace resource in namespace.yaml
+# (kept there, not duplicated here, so kustomize has exactly one Namespace
+# object to manage). If you're using Linkerd instead, swap that label for
+# `linkerd.io/inject: enabled` on the Namespace and drop this
+# PeerAuthentication resource — Linkerd enables mTLS by default with no
+# extra manifest.
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: ecommerce-shootout
+spec:
+  mtls:
+    mode: STRICT

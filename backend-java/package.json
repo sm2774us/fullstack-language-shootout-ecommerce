@@ -1,0 +1,42 @@
+{
+  "name": "backend-java",
+  "private": true,
+  "nx": {
+    "targets": {
+      "build": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "mvn -q -DskipTests package",
+          "cwd": "backend-java"
+        }
+      },
+      "serve": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "mvn spring-boot:run",
+          "cwd": "backend-java"
+        }
+      },
+      "container-build": {
+        "executor": "nx:run-commands",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "command": "docker build -t backend-java:latest -f ./backend-java/Dockerfile ./backend-java"
+        }
+      },
+      "generate": {
+        "executor": "nx:run-commands",
+        "dependsOn": [
+          "proto:generate"
+        ],
+        "cache": true,
+        "options": {
+          "command": "echo 'stubs provided by proto:generate (buf)'",
+          "cwd": "backend-java"
+        }
+      }
+    }
+  }
+}

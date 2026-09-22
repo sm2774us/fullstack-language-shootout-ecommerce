@@ -1,0 +1,42 @@
+{
+  "name": "backend-csharp",
+  "private": true,
+  "nx": {
+    "targets": {
+      "build": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "dotnet build -c Release",
+          "cwd": "backend-csharp"
+        }
+      },
+      "serve": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "dotnet run",
+          "cwd": "backend-csharp"
+        }
+      },
+      "container-build": {
+        "executor": "nx:run-commands",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "command": "docker build -t backend-csharp:latest -f ./backend-csharp/Dockerfile ./backend-csharp"
+        }
+      },
+      "generate": {
+        "executor": "nx:run-commands",
+        "dependsOn": [
+          "proto:generate"
+        ],
+        "cache": true,
+        "options": {
+          "command": "echo 'stubs provided by proto:generate (buf)'",
+          "cwd": "backend-csharp"
+        }
+      }
+    }
+  }
+}

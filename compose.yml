@@ -1,0 +1,98 @@
+services:
+  prometheus:
+    image: prom/prometheus:v2.54.0
+    ports: ["9090:9090"]
+    volumes:
+      - ./shared-benchmarks/telemetry/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--enable-feature=remote-write-receiver"
+    networks: [mesh]
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    ports: ["3001:3000"]
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    volumes:
+      - ./shared-benchmarks/telemetry/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yaml
+    networks: [mesh]
+
+  frontend-web:
+    build: ./frontend-web
+    image: frontend-web:latest
+    ports: ["3000:3000"]
+    environment:
+      - BACKEND_TARGET_URL=http://backend-python:8080
+    networks: [mesh]
+
+  backend-python:
+    build: ./backend-python
+    image: backend-python:latest
+    ports: ["8080:8080", "50051:50051"]  # HTTP + gRPC (see docs/grpc-coverage.md)
+    networks: [mesh]
+
+  backend-rust:
+    build: ./backend-rust
+    image: backend-rust:latest
+    ports: ["8081:8080"]
+    networks: [mesh]
+
+  backend-golang:
+    build: ./backend-golang
+    image: backend-golang:latest
+    ports: ["8082:8080", "50052:50051"]  # HTTP + gRPC (see docs/grpc-coverage.md)
+    networks: [mesh]
+
+  backend-cpp:
+    build: ./backend-cpp
+    image: backend-cpp:latest
+    ports: ["8083:8080"]
+    networks: [mesh]
+
+  backend-java:
+    build: ./backend-java
+    image: backend-java:latest
+    ports: ["8084:8080", "50053:50051"]  # HTTP + gRPC (see docs/grpc-coverage.md)
+    networks: [mesh]
+
+  backend-csharp:
+    build: ./backend-csharp
+    image: backend-csharp:latest
+    ports: ["8085:8080"]
+    networks: [mesh]
+
+  backend-kotlin:
+    build: ./backend-kotlin
+    image: backend-kotlin:latest
+    ports: ["8086:8080"]
+    networks: [mesh]
+
+  backend-scala:
+    build: ./backend-scala
+    image: backend-scala:latest
+    ports: ["8087:8080"]
+    networks: [mesh]
+
+  backend-r:
+    build: ./backend-r
+    image: backend-r:latest
+    ports: ["8088:8080"]
+    networks: [mesh]
+
+  backend-ruby:
+    build: ./backend-ruby
+    image: backend-ruby:latest
+    ports: ["8089:8080"]
+    networks: [mesh]
+
+  backend-ocaml:
+    build: ./backend-ocaml
+    image: backend-ocaml:latest
+    ports: ["8090:8080"]
+    networks: [mesh]
+
+networks:
+  mesh:
+    driver: bridge

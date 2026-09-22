@@ -1,0 +1,30 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ecommerce-shootout
+resources:
+  - namespace.yaml
+  - secrets.yaml
+  - service-mesh.yaml
+  - backend-python-deployment.yaml
+  - backend-python-hpa.yaml
+  - backend-rust-deployment.yaml
+  - backend-rust-hpa.yaml
+  - backend-golang-deployment.yaml
+  - backend-golang-hpa.yaml
+  - backend-cpp-deployment.yaml
+  - backend-cpp-hpa.yaml
+  - backend-java-deployment.yaml
+  - backend-java-hpa.yaml
+  - backend-csharp-deployment.yaml
+  - backend-csharp-hpa.yaml
+  - backend-kotlin-deployment.yaml
+  - backend-kotlin-hpa.yaml
+  - backend-scala-deployment.yaml
+  - backend-scala-hpa.yaml
+  - backend-r-deployment.yaml
+  - backend-r-hpa.yaml
+  - backend-ruby-deployment.yaml
+  - backend-ruby-hpa.yaml
+  - backend-ocaml-deployment.yaml
+  - backend-ocaml-hpa.yaml
+  - frontend-web-deployment.yaml

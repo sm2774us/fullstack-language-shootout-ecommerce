@@ -1,0 +1,42 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources: [../../base]
+# AKS: point every image at <registry>.azurecr.io/<name>:latest — swap the
+# placeholder segments (account/region/project) for your own.
+images:
+  - name: backend-python
+    newName: <registry>.azurecr.io/backend-python
+    newTag: latest
+  - name: backend-rust
+    newName: <registry>.azurecr.io/backend-rust
+    newTag: latest
+  - name: backend-golang
+    newName: <registry>.azurecr.io/backend-golang
+    newTag: latest
+  - name: backend-cpp
+    newName: <registry>.azurecr.io/backend-cpp
+    newTag: latest
+  - name: backend-java
+    newName: <registry>.azurecr.io/backend-java
+    newTag: latest
+  - name: backend-csharp
+    newName: <registry>.azurecr.io/backend-csharp
+    newTag: latest
+  - name: backend-kotlin
+    newName: <registry>.azurecr.io/backend-kotlin
+    newTag: latest
+  - name: backend-scala
+    newName: <registry>.azurecr.io/backend-scala
+    newTag: latest
+  - name: backend-r
+    newName: <registry>.azurecr.io/backend-r
+    newTag: latest
+  - name: backend-ruby
+    newName: <registry>.azurecr.io/backend-ruby
+    newTag: latest
+  - name: backend-ocaml
+    newName: <registry>.azurecr.io/backend-ocaml
+    newTag: latest
+  - name: frontend-web
+    newName: <registry>.azurecr.io/frontend-web
+    newTag: latest

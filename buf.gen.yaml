@@ -1,0 +1,59 @@
+version: v2
+# Each backend gets its stubs generated into its own tree so imports stay
+# inside that backend's module (no cross-language shared node_modules-style
+# generated dir). `buf generate` reads this once; per-language `out` paths
+# below route the same proto/ecommerce.proto into every backend.
+inputs:
+  - directory: proto
+
+plugins:
+  # Python — grpcio-tools' grpc_python plugin, invoked via protoc-gen shim
+  - remote: buf.build/protocolbuffers/python
+    out: backend-python/modules/generated
+  - remote: buf.build/grpc/python
+    out: backend-python/modules/generated
+
+  # Go
+  - remote: buf.build/protocolbuffers/go
+    out: backend-golang/modules/generated
+    opt: paths=source_relative
+  - remote: buf.build/grpc/go
+    out: backend-golang/modules/generated
+    opt: paths=source_relative
+
+  # Java
+  - remote: buf.build/protocolbuffers/java
+    out: backend-java/src/main/java
+  - remote: buf.build/grpc/java
+    out: backend-java/src/main/java
+
+  # Kotlin (reuses the Java message classes + generates Kotlin gRPC stubs)
+  - remote: buf.build/grpc/kotlin
+    out: backend-kotlin/src/main/kotlin
+
+  # C# / .NET
+  - remote: buf.build/protocolbuffers/csharp
+    out: backend-csharp/modules/generated
+  - remote: buf.build/grpc/csharp
+    out: backend-csharp/modules/generated
+
+  # C++
+  - remote: buf.build/protocolbuffers/cpp
+    out: backend-cpp/modules/generated
+  - remote: buf.build/grpc/cpp
+    out: backend-cpp/modules/generated
+
+  # TypeScript (frontend gRPC-Web client)
+  - remote: buf.build/bufbuild/es
+    out: frontend-web/src/lib/generated
+    opt: target=ts
+
+# Rust (tonic-build), Scala (scalapb), R (RProtoBuf), Ruby (grpc_tools_ruby),
+# and OCaml (ocaml-protoc) do not have stable buf remote plugins as of this
+# writing, so those five generate at *build time* via each language's own
+# native tool instead of via `buf generate` here:
+#   - Rust:   tonic-build runs from build.rs, reading ../../proto directly
+#   - Scala:  sbt-protoc + scalapb runs from build.sbt
+#   - R:      RProtoBuf::readProtoFiles() at package load (see R/generated.R)
+#   - Ruby:   grpc_tools_ruby_protoc invoked from the Rakefile :codegen task
+#   - OCaml:  ocaml-protoc invoked from a dune rule in modules/generated/

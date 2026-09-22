@@ -1,0 +1,3 @@
+(library
+ (name catalog_internal)
+ (modules catalog_service))

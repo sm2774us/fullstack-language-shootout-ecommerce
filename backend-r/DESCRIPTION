@@ -1,0 +1,15 @@
+Package: backendr
+Title: R (plumber) reference backend for the polyglot e-commerce shootout
+Version: 0.1.0
+Description: Modular-monolith R backend exposing /api/perf via plumber, managed with devtools/usethis.
+Depends: R (>= 4.4.0)
+Imports:
+    plumber (>= 1.2.2),
+    jsonlite (>= 1.8.9),
+    uuid (>= 1.2.1),
+    RProtoBuf (>= 0.4.21),
+    digest (>= 0.6.37)
+License: MIT
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2

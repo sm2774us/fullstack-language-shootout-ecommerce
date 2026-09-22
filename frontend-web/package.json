@@ -1,0 +1,57 @@
+{
+  "name": "frontend-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev --port 3000",
+    "build": "vite build",
+    "start": "node .output/server/index.mjs"
+  },
+  "dependencies": {
+    "@tanstack/react-start": "^1.121.0",
+    "@tanstack/react-router": "^1.121.0",
+    "@tanstack/react-query": "^5.62.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zustand": "^5.0.2",
+    "zod": "^3.24.1",
+    "drizzle-orm": "^0.38.2",
+    "@stripe/stripe-js": "^5.4.0",
+    "motion": "^11.15.0",
+    "tailwindcss": "^4.0.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "stripe": "^17.4.0"
+  },
+  "devDependencies": {
+    "vite": "^6.0.3",
+    "typescript": "^5.7.2",
+    "drizzle-kit": "^0.30.1"
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "npm run build",
+          "cwd": "frontend-web"
+        }
+      },
+      "serve": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "npm run dev",
+          "cwd": "frontend-web"
+        }
+      },
+      "container-build": {
+        "executor": "nx:run-commands",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "command": "docker build -t frontend-web:latest -f ./frontend-web/Dockerfile ./frontend-web"
+        }
+      }
+    }
+  }
+}

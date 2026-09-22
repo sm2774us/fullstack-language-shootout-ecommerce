@@ -1,0 +1,17 @@
+node_modules/
+.nx/
+benchmarking-results/*
+!benchmarking-results/.gitkeep
+target/
+build/
+_build/
+.output/
+bin/*.exe
+*.class
+.venv/
+__pycache__/
+*.pyc
+obj/
+.vs/
+.dotnet/
+.gradle/

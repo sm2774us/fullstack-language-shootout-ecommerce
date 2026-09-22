@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 5s
+
+# k6 pushes directly via --out experimental-prometheus-rw, so no scrape
+# job is required for the benchmark data itself; this scrapes Prometheus's
+# own metrics for the Grafana "meta" dashboard.
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
