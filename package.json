@@ -3,6 +3,10 @@
   "private": true,
   "version": "0.1.0",
   "description": "Root monorepo dev orchestrator & Nx dependencies for the 1 frontend + 11 backend polyglot e-commerce shootout",
+  "workspaces": [
+    "frontend-web",
+    "shared-benchmarks"
+  ],
   "scripts": {
     "build:affected": "nx affected -t build",
     "containers:affected": "nx affected -t container-build",
