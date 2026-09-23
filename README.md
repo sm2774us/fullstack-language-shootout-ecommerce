@@ -251,7 +251,15 @@ Push to `main` or open a PR — `.github/workflows/ci.yml` runs automatically
 across an `ubuntu-latest` **and** a `windows-latest` runner in parallel:
 
 - Both runners install Node, the language toolchains, and run
-  `nx affected -t build` so compile correctness is checked on both OSes.
+  `nx affected -t build` so compile correctness is checked on both OSes —
+  with one exception: `backend-ocaml` builds on Ubuntu only. Installing its
+  opam dependency tree on Windows hits a well-documented Win32 MAX_PATH
+  (260-char) limitation in `dune`'s own upstream package (it bundles a
+  deeply nested test fixture, and GitHub Actions' Windows checkout path
+  combined with opam's switch paths pushes past 260 characters). This is
+  an upstream/OS characteristic, not something fixable from this repo —
+  Windows CI explicitly excludes it (`--exclude=backend-ocaml`) rather than
+  silently failing.
 - The Docker build, the full sequential k6 benchmark matrix, and the
   results aggregation run **only on the Ubuntu runner** — Windows runners
   don't reliably support `docker compose` with Linux containers, so

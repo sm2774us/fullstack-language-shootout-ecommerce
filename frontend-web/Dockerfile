@@ -19,6 +19,9 @@ RUN npm run build
 
 FROM node:22-slim
 WORKDIR /app
-COPY --from=builder /app/frontend-web/.output ./.output
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/frontend-web/node_modules ./frontend-web/node_modules
+COPY --from=builder /app/frontend-web/dist ./dist
+COPY --from=builder /app/frontend-web/server-entry.mjs ./server-entry.mjs
 EXPOSE 3000
-CMD ["node", ".output/server/index.mjs"]
+CMD ["node", "server-entry.mjs"]
