@@ -36,11 +36,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake openjdk-21-jdk maven \
-            ruby-full r-base
+            ruby-full r-base protobuf-compiler
 
       - name: Setup native compilers & toolchains (Windows)
         if: matrix.os == 'windows-latest'
-        run: choco install cmake microsoft-openjdk-21 maven ruby r -y
+        run: choco install cmake microsoft-openjdk-21 maven ruby r protoc -y
 
       - name: Setup OCaml & opam
         uses: ocaml/setup-ocaml@v3

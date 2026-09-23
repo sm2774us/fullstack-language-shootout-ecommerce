@@ -49,7 +49,7 @@
           "build"
         ],
         "options": {
-          "command": "docker build -t frontend-web:latest -f ./frontend-web/Dockerfile ./frontend-web"
+          "command": "docker build -t frontend-web:latest -f frontend-web/Dockerfile ."
         }
       }
     }

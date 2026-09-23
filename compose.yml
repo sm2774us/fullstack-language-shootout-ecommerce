@@ -20,7 +20,9 @@ services:
     networks: [mesh]
 
   frontend-web:
-    build: ./frontend-web
+    build:
+      context: .
+      dockerfile: frontend-web/Dockerfile
     image: frontend-web:latest
     ports: ["3000:3000"]
     environment:
