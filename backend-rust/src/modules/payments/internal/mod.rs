@@ -1,4 +1,6 @@
 //! Business logic — hidden from the outside world.
+pub mod webhook;
+
 use serde::Serialize;
 use std::collections::HashMap;
 use std::sync::Mutex;
