@@ -10,3 +10,11 @@ func Authorize(paymentID, orderID string, amountCents int64) Payment {
 }
 func Capture(paymentID string) (Payment, bool)                    { return internal.Capture(paymentID) }
 func Refund(paymentID string, amountCents int64) (Payment, bool)  { return internal.Refund(paymentID, amountCents) }
+
+// VerifyStripeWebhook is the only way to reach the webhook signature
+// verification logic from outside the payments module — apps/web-api must
+// not (and, per Go's own internal-package visibility rules, cannot) import
+// modules/payments/internal directly.
+func VerifyStripeWebhook(payload []byte, sigHeader string) error {
+	return internal.VerifyStripeWebhook(payload, sigHeader)
+}

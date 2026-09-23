@@ -11,7 +11,6 @@ import (
 	catalogapi "github.com/example/ecommerce-shootout/backend-golang/modules/catalog/publicapi"
 	ordersapi "github.com/example/ecommerce-shootout/backend-golang/modules/orders/publicapi"
 	paymentsapi "github.com/example/ecommerce-shootout/backend-golang/modules/payments/publicapi"
-	paymentsinternal "github.com/example/ecommerce-shootout/backend-golang/modules/payments/internal"
 )
 
 var catalog = catalogapi.NewCatalogPublicApi()
@@ -62,7 +61,7 @@ func stripeWebhookHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "cannot read body", http.StatusBadRequest)
 		return
 	}
-	if err := paymentsinternal.VerifyStripeWebhook(body, r.Header.Get("Stripe-Signature")); err != nil {
+	if err := paymentsapi.VerifyStripeWebhook(body, r.Header.Get("Stripe-Signature")); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
