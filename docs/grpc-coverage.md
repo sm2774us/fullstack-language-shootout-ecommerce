@@ -21,9 +21,9 @@ HTTP-only rather than shipping something unverified and mislabeled.
 
 | Backend | gRPC server | File | Notes |
 |---|---|---|---|
-| Python | ✅ Implemented | `apps/web-api/grpc_server.py` | All 4 services; runs on port 50051 alongside FastAPI on 8080 |
-| Go | ✅ Implemented | `apps/web-api/grpc_server.go` | All 4 services; runs on port 50051 alongside net/http on 8080 |
-| Java | ✅ Implemented | `src/main/java/com/example/webapi/GrpcServer.java` | All 4 services; runs on port 50051 alongside Spring Boot on 8080 |
+| Python | ✅ Implemented, degrades gracefully | `apps/web-api/grpc_server.py` | All 4 services; runs on port 50051 alongside FastAPI on 8080. If `modules/generated/` isn't present, `main.py` catches the `ImportError`, logs it, and serves HTTP-only — it does not crash the process. |
+| Go | ✅ Implemented, excluded from default build | `apps/web-api/grpc_server.go` | All 4 services. Gated behind the `grpc` build tag (`go build -tags grpc ./apps/web-api`) so the DEFAULT build (what the Dockerfile runs) compiles without `modules/generated` existing — `apps/web-api/grpc_noop.go` supplies a no-op `serveGRPC` for that default path. |
+| Java | ✅ Implemented, excluded from default build | `src/main/java/com/example/webapi/GrpcServer.java` | All 4 services. Excluded from Maven's default compilation via `pom.xml`'s `maven-compiler-plugin` excludes, since it references grpc-java codegen output that doesn't exist yet. `WebApiApplication.java` looks it up reflectively rather than calling it directly, so the app compiles and runs HTTP-only without it. |
 | Rust | ⏳ Codegen wired, servicer not written | `build.rs` (tonic-build) | `tonic::include_proto!` macro is the next step — natural fit given axum is already async |
 | C# | ⏳ Codegen wired, servicer not written | `buf.gen.yaml` → `modules/generated` | ASP.NET Core has first-class `Grpc.AspNetCore` support; straightforward next addition |
 | Kotlin | ⏳ Codegen wired, servicer not written | `buf.gen.yaml` → `modules/generated` | Can reuse Java's generated message classes + `grpc-kotlin` coroutine stubs |

@@ -7,7 +7,18 @@ module's public-api is imported here — internal/ and infrastructure/
 packages are never reached from outside their own module.
 """
 import asyncio
+import sys
 import time
+from pathlib import Path
+
+# Ensure the project root (two levels up from this file: apps/web-api/main.py
+# -> apps/web-api -> apps -> project root) is on sys.path so `modules.*`
+# imports resolve regardless of how this script is invoked. Python only
+# auto-adds the *script's own* directory to sys.path, not the CWD or project
+# root, and the editable install (`uv pip install -e .`) intentionally does
+# not create an import-path mapping either — see pyproject.toml's
+# `bypass-selection` comment for why.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import uvicorn
 from fastapi import FastAPI, Request
@@ -99,9 +110,22 @@ async def create_order(payload: dict):
 
 if __name__ == "__main__":
     import threading
-    from grpc_server import serve as serve_grpc
 
-    grpc_server = serve_grpc(port=50051)
-    threading.Thread(target=grpc_server.wait_for_termination, daemon=True).start()
+    try:
+        from grpc_server import serve as serve_grpc
+
+        grpc_server = serve_grpc(port=50051)
+        threading.Thread(target=grpc_server.wait_for_termination, daemon=True).start()
+    except ImportError as e:
+        # modules/generated/ (ecommerce_pb2.py, ecommerce_pb2_grpc.py) is
+        # produced by `buf generate` — see docs/grpc-coverage.md. It isn't
+        # guaranteed to exist in every build path (e.g. the benchmarking
+        # step's on-demand `docker compose` build doesn't run Nx's
+        # generate step), so gRPC is best-effort: log and continue serving
+        # HTTP-only rather than crash the whole process over an optional
+        # second transport.
+        print(f"[grpc] skipping gRPC server — generated stubs not found ({e}). "
+              f"Run 'npx nx run backend-python:generate' to enable it. "
+              f"Serving HTTP only.")
 
     uvicorn.run(app, host="0.0.0.0", port=8080)

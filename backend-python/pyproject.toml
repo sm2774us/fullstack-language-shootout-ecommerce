@@ -15,5 +15,16 @@ dependencies = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.build.targets.wheel]
+# This project ships an application (apps/web-api/main.py + a modules/
+# tree), not a single importable package named after the project — so
+# Hatchling's default "directory matching the project name" heuristic
+# can't find anything to ship. `-e .` (editable install) is used purely
+# to put the repo root on sys.path so `modules.*` imports resolve when
+# running `python apps/web-api/main.py`; `bypass-selection` skips the
+# wheel-content heuristic entirely since no wheel content is needed for
+# that purpose.
+bypass-selection = true
+
 [tool.uv]
 dev-dependencies = ["pytest>=8.3", "httpx>=0.27"]

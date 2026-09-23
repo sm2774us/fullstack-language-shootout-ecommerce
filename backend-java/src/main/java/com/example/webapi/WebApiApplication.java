@@ -13,17 +13,33 @@ import java.util.Map;
 @SpringBootApplication
 public class WebApiApplication {
     public static void main(String[] args) throws Exception {
+        startGrpcServerIfAvailable(args);
+        SpringApplication.run(WebApiApplication.class, args);
+    }
+
+    // GrpcServer is excluded from the default Maven build (see pom.xml's
+    // maven-compiler-plugin excludes) because it references grpc-java
+    // codegen output that doesn't exist until `buf generate` has run — see
+    // docs/grpc-coverage.md. Looking it up reflectively, rather than
+    // calling GrpcServer.main(args) directly, avoids a hard compile-time
+    // dependency on a class that may not have been compiled in.
+    private static void startGrpcServerIfAvailable(String[] args) {
         Thread grpcThread = new Thread(() -> {
             try {
-                GrpcServer.main(args);
+                Class<?> grpcServerClass = Class.forName("com.example.webapi.GrpcServer");
+                var mainMethod = grpcServerClass.getMethod("main", String[].class);
+                mainMethod.invoke(null, (Object) args);
+            } catch (ClassNotFoundException e) {
+                System.out.println("[grpc] skipping gRPC server — GrpcServer was not built in "
+                    + "(run `npx nx run backend-java:generate` then rebuild without the "
+                    + "GrpcServer.java compiler exclude in pom.xml to enable it). "
+                    + "Serving HTTP only.");
             } catch (Exception e) {
                 throw new RuntimeException("gRPC server failed to start", e);
             }
         });
         grpcThread.setDaemon(true);
         grpcThread.start();
-
-        SpringApplication.run(WebApiApplication.class, args);
     }
 }
 

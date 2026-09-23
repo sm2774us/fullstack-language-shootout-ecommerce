@@ -51,6 +51,24 @@
     <finalName>backend-java</finalName>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <!--
+            GrpcServer.java references com.example.ecommerce.v1.* — classes
+            produced by grpc-java codegen (buf generate; see buf.gen.yaml
+            and docs/grpc-coverage.md) that don't exist until that codegen
+            has actually been run. Excluding it from the DEFAULT build lets
+            `mvn package` succeed without that prerequisite; remove this
+            exclude (or override via -Dmaven.compiler.excludes=) once
+            `npx nx run backend-java:generate` has produced those classes.
+          -->
+          <excludes>
+            <exclude>**/GrpcServer.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <version>${spring.boot.version}</version>

@@ -1,8 +1,11 @@
+//go:build grpc
+
 // Real gRPC server for the Go backend, implementing every RPC in
 // proto/ecommerce.proto against the same module publicapi packages the
 // HTTP surface in main.go uses — one business logic layer, two transports.
 //
-// This file imports modules/generated, produced by running codegen locally:
+// Excluded from the DEFAULT build via the `grpc` build tag above: this
+// file imports modules/generated, produced by running codegen locally:
 //
 //	npx nx run proto:generate     # requires network access to buf.build
 //	# or, backend-golang specifically:
@@ -11,8 +14,11 @@
 // buf.gen.yaml at the repo root emits ecommerce.pb.go + ecommerce_grpc.pb.go
 // into modules/generated/. This sandbox has no route to buf.build's remote
 // plugins, so this file is written and reviewed against the .proto schema
-// but has not been executed here — running the command above locally
-// generates the missing package and this file compiles and runs as-is.
+// but has not been compiled here. Without codegen having run, that package
+// has zero .go files, so this file would fail to compile if included in
+// the default build — hence the build tag. Once codegen has run locally,
+// build with `go build -tags grpc ./apps/web-api` to include it, and see
+// docs/grpc-coverage.md for the full picture across all 11 backends.
 package main
 
 import (
