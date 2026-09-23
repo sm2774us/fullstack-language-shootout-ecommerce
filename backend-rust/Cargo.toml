@@ -2,7 +2,7 @@
 name = "backend-rust"
 version = "0.1.0"
 edition = "2021"
-rust-version = "1.82"
+rust-version = "1.85"  # transitive dep (indexmap) requires Cargo's edition2024 support
 
 [dependencies]
 axum = "0.7"
