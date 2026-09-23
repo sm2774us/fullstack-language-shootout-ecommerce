@@ -144,7 +144,20 @@ jobs:
             echo "Booting and benchmarking: $service on host port $port"
 
             docker compose up -d prometheus grafana "$service"
-            sleep 5
+
+            echo "Waiting for $service to become ready on port $port..."
+            for i in $(seq 1 60); do
+              if curl -sf "http://localhost:${port}/healthz" > /dev/null 2>&1; then
+                echo "$service ready after ${i}s"
+                break
+              fi
+              if [ "$i" -eq 60 ]; then
+                echo "ERROR: $service did not become ready within 60s"
+                docker compose logs "$service"
+                exit 1
+              fi
+              sleep 1
+            done
 
             TARGET_URL="http://localhost:${port}" BACKEND_NAME="$label" \
               npx nx run shared-benchmarks:k6-test
