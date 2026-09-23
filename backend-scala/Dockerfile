@@ -2,10 +2,9 @@
 FROM sbtscala/scala-sbt:eclipse-temurin-21.0.5_11_1.10.5_3.5.2 AS builder
 WORKDIR /app
 COPY . .
-RUN sbt assembly || sbt stage
+RUN sbt assembly
 
 FROM eclipse-temurin:21-jre
-COPY --from=builder /app/target/scala-3.5.2 /app
-WORKDIR /app
+COPY --from=builder /app/target/scala-3.5.2/backend-scala.jar /app.jar
 EXPOSE 8080
-CMD ["sh", "-c", "java -cp '*' com.example.webapi.Main"]
+CMD ["java", "-jar", "/app.jar"]
