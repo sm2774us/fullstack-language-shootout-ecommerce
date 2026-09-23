@@ -2,8 +2,9 @@
 #include <httplib.h>
 #include <nlohmann/json.hpp>
 #include "../../modules/catalog/public_api/catalog_api.hpp"
+#include "../../modules/orders/public_api/orders_api.hpp"
 #include "../../modules/payments/internal/webhook.hpp"
-#include "../../modules/payments/internal/service.hpp"
+#include "../../modules/payments/public_api/service.hpp"
 #include <chrono>
 using json = nlohmann::json;
 
@@ -56,14 +57,14 @@ int main() {
         std::string payment_intent_id = data_obj.value("id", "");
 
         if (event_type == "payment_intent.succeeded" && !order_id.empty()) {
-            PaymentStore::instance().capture(payment_intent_id);
-            OrderStore::instance().mark_paid(order_id, payment_intent_id);
+            payments_capture(payment_intent_id);
+            orders_mark_paid(order_id, payment_intent_id);
         } else if (event_type == "payment_intent.payment_failed" && !order_id.empty()) {
             std::string reason = data_obj.value("last_payment_error", json::object()).value("message", "payment failed");
-            OrderStore::instance().mark_failed(order_id, reason);
+            orders_mark_failed(order_id, reason);
         } else if (event_type == "charge.refunded" && !order_id.empty()) {
             long long amount = data_obj.value("amount_refunded", 0LL);
-            OrderStore::instance().mark_refunded(order_id, amount);
+            orders_mark_refunded(order_id, amount);
         }
         res.set_content(json{{"received", true}, {"event_type", event_type}}.dump(), "application/json");
     });

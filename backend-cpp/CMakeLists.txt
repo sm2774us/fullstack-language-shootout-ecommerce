@@ -12,8 +12,6 @@ FetchContent_MakeAvailable(httplib json)
 
 add_executable(backend_cpp
     apps/web-api/main.cpp
-    modules/orders/internal/order_service.cpp
-    modules/orders/public_api/orders_api.cpp
 )
 target_include_directories(backend_cpp PRIVATE ${CMAKE_SOURCE_DIR})
 target_link_libraries(backend_cpp PRIVATE httplib nlohmann_json::nlohmann_json OpenSSL::Crypto)
