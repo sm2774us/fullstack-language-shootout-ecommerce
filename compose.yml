@@ -24,6 +24,7 @@ services:
       context: .
       dockerfile: frontend-web/Dockerfile
     image: frontend-web:latest
+    pull_policy: build
     ports: ["3000:3000"]
     environment:
       - BACKEND_TARGET_URL=http://backend-python:8080
@@ -32,66 +33,77 @@ services:
   backend-python:
     build: ./backend-python
     image: backend-python:latest
+    pull_policy: build
     ports: ["8080:8080", "50051:50051"]  # HTTP + gRPC (see docs/grpc-coverage.md)
     networks: [mesh]
 
   backend-rust:
     build: ./backend-rust
     image: backend-rust:latest
+    pull_policy: build
     ports: ["8081:8080"]
     networks: [mesh]
 
   backend-golang:
     build: ./backend-golang
     image: backend-golang:latest
+    pull_policy: build
     ports: ["8082:8080", "50052:50051"]  # HTTP + gRPC (see docs/grpc-coverage.md)
     networks: [mesh]
 
   backend-cpp:
     build: ./backend-cpp
     image: backend-cpp:latest
+    pull_policy: build
     ports: ["8083:8080"]
     networks: [mesh]
 
   backend-java:
     build: ./backend-java
     image: backend-java:latest
+    pull_policy: build
     ports: ["8084:8080", "50053:50051"]  # HTTP + gRPC (see docs/grpc-coverage.md)
     networks: [mesh]
 
   backend-csharp:
     build: ./backend-csharp
     image: backend-csharp:latest
+    pull_policy: build
     ports: ["8085:8080"]
     networks: [mesh]
 
   backend-kotlin:
     build: ./backend-kotlin
     image: backend-kotlin:latest
+    pull_policy: build
     ports: ["8086:8080"]
     networks: [mesh]
 
   backend-scala:
     build: ./backend-scala
     image: backend-scala:latest
+    pull_policy: build
     ports: ["8087:8080"]
     networks: [mesh]
 
   backend-r:
     build: ./backend-r
     image: backend-r:latest
+    pull_policy: build
     ports: ["8088:8080"]
     networks: [mesh]
 
   backend-ruby:
     build: ./backend-ruby
     image: backend-ruby:latest
+    pull_policy: build
     ports: ["8089:8080"]
     networks: [mesh]
 
   backend-ocaml:
     build: ./backend-ocaml
     image: backend-ocaml:latest
+    pull_policy: build
     ports: ["8090:8080"]
     networks: [mesh]
 

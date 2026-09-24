@@ -108,17 +108,17 @@ jobs:
 
       - name: Build affected native targets (Ubuntu, Nx cache protected)
         if: matrix.os == 'ubuntu-latest'
-        run: npx nx affected -t build --parallel=3
+        run: npx nx run-many -t build --all --parallel=3
 
       # backend-ocaml is excluded here — see the OCaml/opam setup comment
       # above for why its toolchain isn't installed on Windows at all.
       - name: Build affected native targets (Windows, Nx cache protected)
         if: matrix.os == 'windows-latest'
-        run: npx nx affected -t build --parallel=3 --exclude=backend-ocaml
+        run: npx nx run-many -t build --all --parallel=3 --exclude=backend-ocaml
 
       - name: Build affected container images
         if: matrix.os == 'ubuntu-latest'
-        run: npx nx affected -t container-build --parallel=1
+        run: npx nx run-many -t container-build --all --parallel=1
 
       - name: Run sequential benchmarking matrix (Ubuntu only)
         if: matrix.os == 'ubuntu-latest'
