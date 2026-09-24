@@ -44,8 +44,20 @@ export default function () {
 
 export function handleSummary(data) {
   const filepath = `benchmarking-results/${backendName}-report.json`;
+
+  const failedRate = data.metrics.http_req_failed?.values?.rate ?? null;
+  const p95 = data.metrics.http_req_duration?.values?.["p(95)"] ?? null;
+  const totalReqs = data.metrics.http_reqs?.values?.count ?? null;
+  const failedCount = failedRate != null && totalReqs != null
+    ? Math.round(failedRate * totalReqs) : null;
+
+  const summaryLines = [
+    `\n[k6] Evaluation completed for backend: ${backendName}. Writing ${filepath}`,
+    `[k6] ${backendName}: total_reqs=${totalReqs} failed_rate=${failedRate != null ? (failedRate * 100).toFixed(3) + "%" : "n/a"} failed_count=${failedCount} p95_duration_ms=${p95 != null ? p95.toFixed(1) : "n/a"}`,
+  ];
+
   return {
-    stdout: `\n[k6] Evaluation completed for backend: ${backendName}. Writing ${filepath}\n`,
+    stdout: summaryLines.join("\n") + "\n",
     [filepath]: JSON.stringify(data, null, 2),
   };
 }
