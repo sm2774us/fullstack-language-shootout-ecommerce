@@ -24,7 +24,25 @@ fun main() {
     val orders = OrdersPublicApi()
     val payments = PaymentsPublicApi()
 
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
+    embeddedServer(
+        Netty,
+        port = 8080,
+        host = "0.0.0.0",
+        configure = {
+            // Ktor's Netty engine defaults derive callGroupSize/workerGroupSize/
+            // connectionGroupSize from Runtime.getRuntime().availableProcessors(),
+            // and defaults requestQueueLimit to 16. On GitHub Actions' constrained
+            // (2 vCPU) runners those defaults are too small for this project's k6
+            // benchmark (30 concurrent VUs sustained for 60s), causing the
+            // request queue to fill and connections to fail/time out under load
+            // — explicit, load-appropriate values instead of CPU-count guessing.
+            requestQueueLimit = 200
+            runningLimit = 100
+            callGroupSize = 16
+            workerGroupSize = 16
+            connectionGroupSize = 8
+        }
+    ) {
         install(ContentNegotiation) { json() }
         routing {
             get("/api/perf") {
