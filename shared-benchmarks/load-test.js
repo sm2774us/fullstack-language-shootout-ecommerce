@@ -14,6 +14,17 @@ export const options = {
     http_req_failed: ["rate<0.01"],
     http_req_duration: ["p(95)<250"],
   },
+  // Disables HTTP keep-alive connection reuse across iterations. Without
+  // this, k6 reuses a persistent connection per VU, and with the sleep(0.5)
+  // below creating real idle gaps between requests, any backend whose
+  // default idle-connection timeout is shorter than that gap can close the
+  // connection from its side right as k6 tries to reuse it — a classic
+  // client/server keep-alive race that produces a small, consistent
+  // connection-reset failure rate under sustained load rather than an
+  // outright broken backend. Forcing a fresh connection per request
+  // sidesteps the race entirely, uniformly across every backend under
+  // test, regardless of that backend's specific idle-timeout default.
+  noConnectionReuse: true,
 };
 
 export default function () {
