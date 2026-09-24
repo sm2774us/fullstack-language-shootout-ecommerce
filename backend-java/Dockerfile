@@ -9,4 +9,5 @@ RUN mvn -q -DskipTests package
 FROM eclipse-temurin:21-jre
 COPY --from=builder /app/target/backend-java.jar /app.jar
 EXPOSE 8080 50051
+ENV JAVA_TOOL_OPTIONS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=50.0 -XX:+UseG1GC -XX:MaxGCPauseMillis=100"
 CMD ["java", "-jar", "/app.jar"]
