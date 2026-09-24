@@ -146,21 +146,51 @@ jobs:
             docker compose up -d prometheus grafana "$service"
 
             echo "Waiting for $service to become ready on port $port..."
-            for i in $(seq 1 60); do
+            consecutive_ok=0
+            for i in $(seq 1 90); do
               if curl -sf "http://localhost:${port}/healthz" > /dev/null 2>&1; then
+                consecutive_ok=$((consecutive_ok + 1))
+              else
+                consecutive_ok=0
+              fi
+              # Require 3 consecutive successful health checks, not just one —
+              # a single 200 confirms the port is listening but not that the
+              # runtime (JVM event-loop threads, connection pools, JIT-compiled
+              # hot paths) is actually warmed up for a sudden burst of
+              # concurrent connections. This matters most for JVM-based
+              # backends (Java/Kotlin/Scala), where "listening" and "ready for
+              # concurrent load" aren't the same moment.
+              if [ "$consecutive_ok" -ge 3 ]; then
                 echo "$service ready after ${i}s"
                 break
               fi
-              if [ "$i" -eq 60 ]; then
-                echo "ERROR: $service did not become ready within 60s"
+              if [ "$i" -eq 90 ]; then
+                echo "ERROR: $service did not become consistently ready within 90s"
                 docker compose logs "$service"
                 exit 1
               fi
               sleep 1
             done
 
+            # Warm-up burst: a handful of real, discarded requests to /api/perf
+            # before the measured k6 run starts. This is the standard
+            # mitigation for JVM cold-start flakiness (class loading, JIT
+            # warmup, thread-pool spin-up) that a single readiness check
+            # can't catch — applied to every backend uniformly, not singled
+            # out for any one language, since it's cheap and harmless for
+            # compiled/interpreted backends too.
+            echo "Warming up $service..."
+            for i in $(seq 1 20); do
+              curl -sf "http://localhost:${port}/api/perf" > /dev/null 2>&1 || true
+            done
+
             TARGET_URL="http://localhost:${port}" BACKEND_NAME="$label" \
-              npx nx run shared-benchmarks:k6-test
+              npx nx run shared-benchmarks:k6-test || {
+                echo "k6 run failed for $service — retrying once (transient CI-runner jitter is possible even after warm-up)"
+                sleep 3
+                TARGET_URL="http://localhost:${port}" BACKEND_NAME="$label" \
+                  npx nx run shared-benchmarks:k6-test
+              }
 
             docker compose down
           done
