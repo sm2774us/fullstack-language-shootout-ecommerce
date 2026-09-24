@@ -27,7 +27,6 @@ fun main() {
     embeddedServer(
         Netty,
         port = 8080,
-        host = "0.0.0.0",
         configure = {
             // Ktor's Netty engine defaults derive callGroupSize/workerGroupSize/
             // connectionGroupSize from Runtime.getRuntime().availableProcessors(),
