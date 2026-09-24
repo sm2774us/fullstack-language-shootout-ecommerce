@@ -24,24 +24,18 @@ fun main() {
     val orders = OrdersPublicApi()
     val payments = PaymentsPublicApi()
 
-    embeddedServer(
-        Netty,
-        port = 8080,
-        configure = {
-            // Ktor's Netty engine defaults derive callGroupSize/workerGroupSize/
-            // connectionGroupSize from Runtime.getRuntime().availableProcessors(),
-            // and defaults requestQueueLimit to 16. On GitHub Actions' constrained
-            // (2 vCPU) runners those defaults are too small for this project's k6
-            // benchmark (30 concurrent VUs sustained for 60s), causing the
-            // request queue to fill and connections to fail/time out under load
-            // — explicit, load-appropriate values instead of CPU-count guessing.
-            requestQueueLimit = 200
-            runningLimit = 100
-            callGroupSize = 16
-            workerGroupSize = 16
-            connectionGroupSize = 8
-        }
-    ) {
+    // NOTE: an earlier attempt to tune Netty's engine (requestQueueLimit,
+    // callGroupSize, etc. via a `configure` block) failed to compile against
+    // this project's actual Ktor version — the compiler's own error listed
+    // the real available overloads, and none combine `port`/`configure`
+    // together the way various Ktor doc versions suggest. Rather than keep
+    // guessing at an API surface with no compiler here to check it against,
+    // this uses the plain (factory, port, host, module) call, which is
+    // exactly one of the compiler-confirmed real candidates. If Kotlin's
+    // http_req_failed threshold trips again under the benchmark's 30 VUs,
+    // address it via the k6/workflow side (docs/grpc-coverage.md-style
+    // honesty applies here too) rather than further unverified engine tuning.
+    embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
         install(ContentNegotiation) { json() }
         routing {
             get("/api/perf") {
