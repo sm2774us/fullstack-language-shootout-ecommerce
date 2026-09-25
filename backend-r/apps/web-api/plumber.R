@@ -1,12 +1,18 @@
 # Single deployable entry point for the R backend.
 library(plumber)
-source("R/catalog_internal.R")
-source("R/catalog_public_api.R")
-source("R/payments_webhook.R")
-source("R/orders_internal.R")
-source("R/orders_public_api.R")
-source("R/payments_internal.R")
-source("R/payments_public_api.R")
+# Absolute paths: plumber::plumb() changes the working directory to this
+# file's own directory (apps/web-api/) before sourcing it, so relative
+# paths like "R/catalog_internal.R" would resolve to
+# apps/web-api/R/catalog_internal.R (wrong) instead of the real location.
+# Docker's WORKDIR is always /app, so anchoring here is safe and robust
+# regardless of plumber's internal working-directory behavior.
+source("/app/R/catalog_internal.R")
+source("/app/R/catalog_public_api.R")
+source("/app/R/payments_webhook.R")
+source("/app/R/orders_internal.R")
+source("/app/R/orders_public_api.R")
+source("/app/R/payments_internal.R")
+source("/app/R/payments_public_api.R")
 
 #* @get /api/perf
 function() {
