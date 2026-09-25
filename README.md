@@ -73,7 +73,7 @@ strongly-typed languages, by package/visibility modifiers).
 ├── backend-java/                Maven · Spring Boot
 ├── backend-csharp/               MSBuild (dotnet) · ASP.NET Core minimal API
 ├── backend-kotlin/              Gradle (Kotlin DSL) · Ktor
-├── backend-scala/               sbt · Akka HTTP
+├── backend-scala/               sbt · Pekko HTTP
 ├── backend-r/                   devtools/usethis (DESCRIPTION) · plumber
 ├── backend-ruby/                Rake (Gemfile) · Sinatra + Puma
 └── backend-ocaml/               Dune · Dream

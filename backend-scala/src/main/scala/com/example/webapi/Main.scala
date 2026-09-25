@@ -1,10 +1,10 @@
 // Single deployable entry point for the Scala backend.
 package com.example.webapi
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.Behaviors
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.Directives.*
+import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.server.Directives.*
 import com.example.modules.catalog.publicapi.CatalogPublicApi
 import com.example.modules.catalog.infrastructure.Product
 import com.example.modules.orders.publicapi.OrdersPublicApi

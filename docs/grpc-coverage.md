@@ -28,7 +28,7 @@ HTTP-only rather than shipping something unverified and mislabeled.
 | C# | ⏳ Codegen wired, servicer not written | `buf.gen.yaml` → `modules/generated` | ASP.NET Core has first-class `Grpc.AspNetCore` support; straightforward next addition |
 | Kotlin | ⏳ Codegen wired, servicer not written | `buf.gen.yaml` → `modules/generated` | Can reuse Java's generated message classes + `grpc-kotlin` coroutine stubs |
 | C++ | ⏳ Codegen wired, servicer not written | `buf.gen.yaml` → `modules/generated` | `grpc++` service boilerplate is the most verbose of any language here; higher risk to hand-write unverified |
-| Scala | ⏳ Codegen wired, servicer not written | `build.sbt` (scalapb) | Akka gRPC or scalapb-grpc would host this |
+| Scala | ⏳ Codegen wired, servicer not written | `build.sbt` (scalapb) | Pekko gRPC or scalapb-grpc would host this |
 | Ruby | ⏳ Codegen wired, servicer not written | `Rakefile :codegen` | The `grpc` gem is already in the Gemfile; needs `GRPC::RpcServer` wiring |
 | OCaml | ⏳ Codegen wired, servicer not written | `modules/generated/dune` | `grpc-lwt` is genuinely low-level for hand-written, unexecuted code — highest-risk remaining target |
 | R | ⏳ Codegen wired (descriptors only), servicer not practical | `R/generated.R` (RProtoBuf) | R has no mature async gRPC *server* story; `RProtoBuf` gives you message (de)serialization, not a service host. A real R gRPC server would realistically wrap a C++/Go sidecar rather than run in-process — that's a design decision for whoever picks R, not a gap to silently paper over here |
