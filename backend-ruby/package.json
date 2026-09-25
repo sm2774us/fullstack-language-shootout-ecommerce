@@ -6,7 +6,7 @@
       "build": {
         "executor": "nx:run-commands",
         "options": {
-          "command": "bundle install",
+          "command": "bundle config set --local without 'development' && bundle install",
           "cwd": "backend-ruby"
         }
       },
@@ -33,7 +33,7 @@
           "{workspaceRoot}/proto/ecommerce.proto"
         ],
         "options": {
-          "command": "rake codegen",
+          "command": "bundle config set --local without '' && bundle install && rake codegen",
           "cwd": "backend-ruby"
         }
       }

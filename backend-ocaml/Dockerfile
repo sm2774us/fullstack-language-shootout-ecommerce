@@ -2,7 +2,13 @@
 FROM ocaml/opam:ubuntu-24.04-ocaml-5.2 AS builder
 WORKDIR /app
 USER opam
-RUN opam install -y dune dream yojson
+# digestif: used by the Stripe webhook verifier (modules/payments/internal).
+# ocaml-protoc-plugin: used by the codegen rule in modules/generated/dune,
+# which participates in the default `dune build` target. grpc/grpc-lwt are
+# deliberately left out — declared in backend-ocaml.opam as a future
+# dependency (see docs/grpc-coverage.md) but not yet referenced by any
+# buildable code, so there's no reason to install them here yet.
+RUN opam install -y dune dream yojson digestif ocaml-protoc-plugin
 COPY --chown=opam . .
 RUN opam exec -- dune build --release
 
