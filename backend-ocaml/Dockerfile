@@ -10,7 +10,7 @@ USER opam
 # buildable code, so there's no reason to install them here yet.
 RUN opam install -y dune dream yojson digestif ocaml-protoc-plugin
 COPY --chown=opam . .
-RUN opam exec -- dune build --release
+RUN opam exec -- dune build --profile release
 
 FROM ubuntu:24.04
 RUN apt-get update && apt-get install -y --no-install-recommends libev4 ca-certificates && rm -rf /var/lib/apt/lists/*
