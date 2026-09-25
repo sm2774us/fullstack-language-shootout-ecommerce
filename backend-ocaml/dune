@@ -1,0 +1,10 @@
+; modules/generated's codegen rule references ../../proto/ecommerce.proto —
+; a path outside this project's own root, which is both outside the Docker
+; build context (scoped to just backend-ocaml/, not the repo root where
+; proto/ actually lives) and outside dune's own project-root sandboxing for
+; (deps ...) stanzas. Nothing in bin/dune or any other module here actually
+; depends on the ecommerce_generated library, so excluding this directory
+; entirely doesn't remove anything real from the build — it's still there,
+; documented as future codegen wiring (see docs/grpc-coverage.md), just not
+; unconditionally attempted by every default `dune build`.
+(subdir modules (dirs :standard \ generated))

@@ -23,28 +23,28 @@ C++, Java, C#, Kotlin, Scala, R, Ruby, and OCaml under identical load.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│                         frontend-web (TanStack Start)                 │
-│         React 19 · shadcn/ui · Tailwind v4 · TanStack Query/Router    │
-│               Zustand · Zod · Drizzle ORM · Stripe · Motion            │
-└───────────────────────────────┬────────────────────────────────────┘
-                                 │  gRPC / HTTP, one backend at a time
-                                 ▼
-        ┌────────────────────────────────────────────────────┐
-        │        ONE of 11 interchangeable backends            │
-        │  python · rust · golang · cpp · java · csharp ·      │
+│                         frontend-web (TanStack Start)                │
+│         React 19 · shadcn/ui · Tailwind v4 · TanStack Query/Router   │
+│               Zustand · Zod · Drizzle ORM · Stripe · Motion          │
+└───────────────────────────────┬──────────────────────────────────────┘
+                                │  gRPC / HTTP, one backend at a time
+                                ▼
+        ┌───────────────────────────────────────────────────────┐
+        │        ONE of 11 interchangeable backends             │
+        │  python · rust · golang · cpp · java · csharp ·       │
         │  kotlin · scala · r · ruby · ocaml                    │
-        │                                                        │
+        │                                                       │
         │  apps/web-api/            single deployable entry     │
         │  modules/orders/          public-api | internal |     │
         │  modules/payments/                     infrastructure │
-        │  modules/notifications/                                │
-        └────────────────────────────────────────────────────┘
-                                 │
-                                 ▼
-        ┌────────────────────────────────────────────────────┐
+        │  modules/notifications/                               │
+        └───────────────────────────────────────────────────────┘
+                                │
+                                ▼
+        ┌──────────────────────────────────────────────────────┐
         │   shared-benchmarks/  (k6 load-test.js + parser)     │
-        │   Prometheus  ──remote-write──▶  Grafana dashboards   │
-        └────────────────────────────────────────────────────┘
+        │   Prometheus  ──remote-write──> Grafana dashboards   │
+        └──────────────────────────────────────────────────────┘
 ```
 
 Every module (`orders`, `payments`, `notifications`) exposes **only** its

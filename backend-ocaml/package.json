@@ -25,17 +25,6 @@
         "options": {
           "command": "docker build -t backend-ocaml:latest -f ./backend-ocaml/Dockerfile ./backend-ocaml"
         }
-      },
-      "generate": {
-        "executor": "nx:run-commands",
-        "cache": true,
-        "inputs": [
-          "{workspaceRoot}/proto/ecommerce.proto"
-        ],
-        "options": {
-          "command": "opam exec -- dune build modules/generated",
-          "cwd": "backend-ocaml"
-        }
       }
     }
   }
